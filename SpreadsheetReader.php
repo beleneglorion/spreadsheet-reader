@@ -37,7 +37,7 @@
 		 * @param string Original filename (in case of an uploaded file), used to determine file type, optional
 		 * @param string MIME type from an upload, used to determine file type, optional
 		 */
-		public function __construct($Filepath, $OriginalFilename = false, $MimeType = false)
+		public function __construct($Filepath, $OriginalFilename = false, $MimeType = false, $Options = array())
 		{
 			if (!is_readable($Filepath))
 			{
@@ -51,6 +51,9 @@
 				date_default_timezone_set($DefaultTZ);
 			}
 
+                        // Merge options
+                       $Options = array_merge($this->Options, $Options);
+                        
 			// 1. Determine type
 			if (!$OriginalFilename)
 			{
@@ -151,18 +154,18 @@
 			{
 				case self::TYPE_XLSX:
 					self::Load(self::TYPE_XLSX);
-					$this -> Handle = new SpreadsheetReader_XLSX($Filepath);
+					$this -> Handle = new SpreadsheetReader_XLSX($Filepath,$Options);
 					break;
 				case self::TYPE_CSV:
 					self::Load(self::TYPE_CSV);
-					$this -> Handle = new SpreadsheetReader_CSV($Filepath, $this -> Options);
+					$this -> Handle = new SpreadsheetReader_CSV($Filepath, $Options);
 					break;
 				case self::TYPE_XLS:
 					// Everything already happens above
 					break;
 				case self::TYPE_ODS:
 					self::Load(self::TYPE_ODS);
-					$this -> Handle = new SpreadsheetReader_ODS($Filepath, $this -> Options);
+					$this -> Handle = new SpreadsheetReader_ODS($Filepath, $Options);
 					break;
 			}
 		}
@@ -295,4 +298,4 @@
 			return 0;
 		}
 	}
-?>
+

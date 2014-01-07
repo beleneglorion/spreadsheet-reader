@@ -13,20 +13,10 @@
 		const CELL_TYPE_STR = 'str';
 		const CELL_TYPE_INLINE_STR = 'inlineStr';
 
-		/**
-		 * 
-                 * @var integer Number of shared strings that can be reasonably cached
-                 *  Number of shared strings that can be reasonably cached, i.e., that aren't read from file but stored in memory.
-		 *  if the total number of shared strings is higher than this, caching is not used.
-		 *  if this value is null, shared strings are cached regardless of amount.
-		 *  With large shared string caches there are huge performance gains, however a lot of memory could be used which
-		 *  can be a problem, especially on shared hosting.
-		 */
-                private  $SharedStringCacheLimit = 50000;
 
 		private $Options = array(
-			'TempDir' => '',
-			'ReturnDateTimeObjects' => false
+			'ReturnDateTimeObjects' => false,
+                        'SharedStringCacheLimit' => 50000      // Max Number of SharedString used for cache if null, no limit, if more string than allowed in cache = no cache          
 		);
 
 		private static $RuntimeInfo = array(
@@ -208,8 +198,10 @@
 				throw new Exception('SpreadsheetReader_XLSX: File not readable ('.$Filepath.')');
 			}
 
-			$this -> TempDir = isset($Options['TempDir']) && is_writable($Options['TempDir']) ?
-				$Options['TempDir'] :
+                        $this->Options = array_merge($this->Options,$Options);
+                        
+			$this -> TempDir = isset($this->Options['TempDir']) && is_writable($this->Options['TempDir']) ?
+				$this->Options['TempDir'] :
 				sys_get_temp_dir();
 
 			$this -> TempDir = rtrim($this -> TempDir, DIRECTORY_SEPARATOR);
@@ -1186,7 +1178,7 @@
                  * @return \SpreadsheetReader_XLSX
                  */
                 public function setSharedStringCacheLimit($SharedStringCacheLimit) {
-                    $this->SharedStringCacheLimit = $SharedStringCacheLimit;
+                    $this->Options['SharedStringCacheLimit'] = $SharedStringCacheLimit;
                     
                     return $this;
                 }
@@ -1196,7 +1188,7 @@
                  * @return integer
                  */
                 public function getSharedStringCacheLimit() {
-                    return $this->SharedStringCacheLimit;
+                    return $this->Options['SharedStringCacheLimit'];
                 }
 	}
-?>
+
