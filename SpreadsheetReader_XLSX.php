@@ -14,13 +14,15 @@
 		const CELL_TYPE_INLINE_STR = 'inlineStr';
 
 		/**
-		 * Number of shared strings that can be reasonably cached, i.e., that aren't read from file but stored in memory.
-		 *	If the total number of shared strings is higher than this, caching is not used.
-		 *	If this value is null, shared strings are cached regardless of amount.
-		 *	With large shared string caches there are huge performance gains, however a lot of memory could be used which
-		 *	can be a problem, especially on shared hosting.
+		 * 
+                 * @var integer Number of shared strings that can be reasonably cached
+                 *  Number of shared strings that can be reasonably cached, i.e., that aren't read from file but stored in memory.
+		 *  if the total number of shared strings is higher than this, caching is not used.
+		 *  if this value is null, shared strings are cached regardless of amount.
+		 *  With large shared string caches there are huge performance gains, however a lot of memory could be used which
+		 *  can be a problem, especially on shared hosting.
 		 */
-		const SHARED_STRING_CACHE_LIMIT = 50000;
+                private  $SharedStringCacheLimit = 50000;
 
 		private $Options = array(
 			'TempDir' => '',
@@ -431,7 +433,7 @@
 				}
 			}
 
-			if (!$this -> SharedStringCount || (self::SHARED_STRING_CACHE_LIMIT < $this -> SharedStringCount && self::SHARED_STRING_CACHE_LIMIT !== null))
+			if (!$this -> SharedStringCount || ($this->getSharedStringCacheLimit() < $this -> SharedStringCount && $this->getSharedStringCacheLimit() !== null))
 			{
 				return false;
 			}
@@ -473,7 +475,7 @@
 		 */
 		private function GetSharedString($Index)
 		{
-			if ((self::SHARED_STRING_CACHE_LIMIT === null || self::SHARED_STRING_CACHE_LIMIT > 0) && !empty($this -> SharedStringCache))
+			if (($this->getSharedStringCacheLimit() === null || $this->getSharedStringCacheLimit() > 0) && !empty($this -> SharedStringCache))
 			{
 				if (isset($this -> SharedStringCache[$Index]))
 				{
@@ -1177,5 +1179,24 @@
 				return $C;
 			}
 		}
+                
+                /**
+                 * set SharedString cache limit, if null  no limit
+                 * @param integer $SharedStringCacheLimit
+                 * @return \SpreadsheetReader_XLSX
+                 */
+                public function setSharedStringCacheLimit($SharedStringCacheLimit) {
+                    $this->SharedStringCacheLimit = $SharedStringCacheLimit;
+                    
+                    return $this;
+                }
+                
+                /**
+                 * return the value of the SharedString cache limit
+                 * @return integer
+                 */
+                public function getSharedStringCacheLimit() {
+                    return $this->SharedStringCacheLimit;
+                }
 	}
 ?>
