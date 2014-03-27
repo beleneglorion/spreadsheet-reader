@@ -74,6 +74,7 @@
 		private $TempFiles = array();
 
 		private $CurrentRow = false;
+        private $count = 0;
 
 		// Runtime parsing data
 		/**
@@ -922,16 +923,35 @@
 				{
 					$this -> Worksheet = new XMLReader;
 				}
+                // counting elements
+                $this->countRow();
 
 				$this -> Worksheet -> open($this -> WorksheetPath);
 				$this -> Valid = true;
 				$this -> CurrentRow = false;
 				$this -> RowOpen = false;
+                
 			}
 
 			$this -> Index = 0;
 		}
 
+        protected function countRow() {
+                $this->Worksheet -> open($this -> WorksheetPath);
+                // find first row
+                while ($this->Worksheet->read())
+				{
+					if ($this->Worksheet->name == 'row') {
+                        break;
+                    }
+                }
+                $this->count = 0;
+                while ($this->Worksheet->next()) {
+                    $this->count++;
+                }
+			    $this -> Worksheet -> close();
+        }
+        
 		/**
 		 * Return the current element.
 		 * Similar to the current() function for arrays in PHP
@@ -1110,7 +1130,7 @@
 		 */
 		public function count()
 		{
-			return $this -> Index + 1;
+			return $this->count;
 		}
 
 		/**
