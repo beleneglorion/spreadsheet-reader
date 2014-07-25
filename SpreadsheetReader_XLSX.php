@@ -238,13 +238,14 @@
 			}
 
 			$Sheets = $this -> Sheets();
-			
+            $SheetIndexes = array_flip(array_keys($this -> Sheets));
 			foreach ($this -> Sheets as $Index => $Name)
 			{
-				if ($Zip -> locateName('xl/worksheets/sheet'.$Index.'.xml') !== false)
+                $RealSheetIndex = $SheetIndexes[$Index]+1;
+				if ($Zip -> locateName('xl/worksheets/sheet'.$RealSheetIndex.'.xml') !== false)
 				{
-					$Zip -> extractTo($this -> TempDir, 'xl/worksheets/sheet'.$Index.'.xml');
-					$this -> TempFiles[] = $this -> TempDir.'xl'.DIRECTORY_SEPARATOR.'worksheets'.DIRECTORY_SEPARATOR.'sheet'.$Index.'.xml';
+					$Zip -> extractTo($this -> TempDir, 'xl/worksheets/sheet'.$RealSheetIndex.'.xml');
+					$this -> TempFiles[] = $this -> TempDir.'xl'.DIRECTORY_SEPARATOR.'worksheets'.DIRECTORY_SEPARATOR.'sheet'.$RealSheetIndex.'.xml';
 				}
 			}
 
@@ -392,17 +393,14 @@
 		 */
 		public function ChangeSheet($Index)
 		{
-			$RealSheetIndex = false;
 			$Sheets = $this -> Sheets();
-			if (isset($Sheets[$Index]))
+			if (!isset($Sheets[$Index]))
 			{
-				$SheetIndexes = array_keys($this -> Sheets);
-				$RealSheetIndex = $SheetIndexes[$Index];
-			}
+                return false;
+			} 
+			$TempWorksheetPath = $this -> TempDir.'xl/worksheets/sheet'.($Index+1).'.xml';
 
-			$TempWorksheetPath = $this -> TempDir.'xl/worksheets/sheet'.$RealSheetIndex.'.xml';
-
-			if ($RealSheetIndex !== false && is_readable($TempWorksheetPath))
+			if ($Index !== false && is_readable($TempWorksheetPath))
 			{
 				$this -> WorksheetPath = $TempWorksheetPath;
 				$this -> rewind(true);
